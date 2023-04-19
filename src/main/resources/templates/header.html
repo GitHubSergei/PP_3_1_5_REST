@@ -1,0 +1,10 @@
+
+<div class="out" th:fragment="header">
+    <a class="logout" href="javascript: document.logoutForm.submit()" role="menuitem"> Logout</a>
+
+    <form name="logoutForm" th:action="@{/logout}" method="post" th:hidden="true">
+        <input hidden type="submit" value="Sign Out"/>
+    </form>
+    <br/>
+    <br/>
+</div>

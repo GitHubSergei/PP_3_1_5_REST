@@ -1,0 +1,17 @@
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    a.logout {
+        color: #2da1c1;
+        font-size: small;
+        text-decoration: none;
+        float: left;
+    }
+
+    a.logout:hover {
+        color: #f90;
+        text-decoration: underline;
+    }
+
