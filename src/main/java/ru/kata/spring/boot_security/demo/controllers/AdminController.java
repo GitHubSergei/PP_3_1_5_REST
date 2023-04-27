@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,48 +17,50 @@ import java.util.Set;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
-    @Autowired
-    private WebUserService userService;
 
-    @Autowired
-    private RoleService roleService;
+    private final WebUserService userService;
+
+    private final RoleService roleService;
+
+    public AdminController(WebUserService userService, RoleService roleService) {
+        this.userService = userService;
+        this.roleService = roleService;
+    }
 
     @GetMapping("/adminpanel")
     public String userList(Model model) {
-        model.addAttribute("allUsers", userService.allUsers());
+        List<WebUser> usr = userService.allUsers();
+        WebUser newUser = new WebUser();
+        List<Role> listOfRoles = roleService.getAllRoles();
+        Set<Role> emptyRoles = new LinkedHashSet<>();
+        newUser.setRoles(emptyRoles);
+
+        model.addAttribute("allUsers", usr);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        model.addAttribute("user", userService.loadUserByUsername(auth.getName()));
+        model.addAttribute("listroles", listOfRoles);
+        model.addAttribute("newUser", newUser);
         return "adminpanel";
     }
 
-    @GetMapping("/addnew")
-    public String newUser(Model model) {
-        WebUser user = new WebUser();
-
-        List<Role> listOfRoles = roleService.getAllRoles();
-
-        Set<Role> emptyRoles = new LinkedHashSet<>();
-        user.setRoles(emptyRoles);
-        model.addAttribute("listroles", listOfRoles);
-        model.addAttribute("user", user);
-
-        return "addnew";
-    }
-
     @PostMapping
-    public String addUser(@ModelAttribute("user") WebUser user) {
-        userService.saveUser(user);
+    public String addUser(@ModelAttribute("newUser") WebUser newUser) {
+        System.out.println(newUser.getName());
+        userService.saveUser(newUser);
         return "redirect:admin/adminpanel";
     }
 
-    @GetMapping("/{id}/edit")
+    @GetMapping("/{id}")
     public String editUser(Model model, @PathVariable("id") long id) {
         List<Role> listOfRoles = roleService.getAllRoles();
-        model.addAttribute("user", userService.findUserById(id));
+        model.addAttribute("updUser", userService.findUserById(id));
         model.addAttribute("listroles", listOfRoles);
-        return "/edit";
+        return "adminpanel";
     }
 
     @PatchMapping("/{id}")
-    public String updateUser(@ModelAttribute("user") WebUser user, @PathVariable("id") int id) {
+    public String updateUser(@ModelAttribute("usr") WebUser user, @ModelAttribute("newUser") WebUser newUser,
+                             @PathVariable("id") int id) {
         userService.updateUser(id, user);
         return "redirect:adminpanel";
     }

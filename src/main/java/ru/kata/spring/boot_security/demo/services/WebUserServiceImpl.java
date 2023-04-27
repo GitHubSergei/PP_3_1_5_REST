@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class WebUserServiceImpl implements WebUserService {
@@ -26,7 +27,7 @@ public class WebUserServiceImpl implements WebUserService {
 
     @Override
     public UserDetails loadUserByUsername(String webusername) throws UsernameNotFoundException {
-        Optional<WebUser> webUser = webUserRepository.findByUserlogin(webusername);
+        Optional<WebUser> webUser = webUserRepository.findByUserEmail(webusername);
 
         if (webUser.isEmpty()) {
             throw new UsernameNotFoundException("User not found!");
@@ -58,5 +59,18 @@ public class WebUserServiceImpl implements WebUserService {
         if (webUserRepository.findById(userId).isPresent()) {
             webUserRepository.deleteById(userId);
         }
+    }
+
+
+    @Override
+    public List<String> getUserRoleNames(Long userId) {
+        Optional<WebUser> webUser = webUserRepository.findById(userId);
+        if (!webUser.isEmpty()) {
+            return webUser.get().getRoles().stream()
+                    .map(Role::getRole)
+                    .map(r->r.replaceAll("ROLE_",r))
+                    .collect(Collectors.toList());
+        }
+        return List.of("");
     }
 }

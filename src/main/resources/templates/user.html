@@ -1,34 +1,86 @@
-<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!doctype html>
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Users</title>
-    <link rel="stylesheet" type="text/css" media="all"
-          href="../styles/css.css" th:href="@{../styles/css.css}" />
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>User page</title>
 </head>
 <body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="p-2 col-6 bg-dark text-left text-white">
+            <span class="h5 font-weight-bold"
+                    th:text="${user.email}"></span><span class="h5">  with roles: </span> <!---md-3 col-lg-->
+            <span class="h5" th:each="role, iterStat  : ${user.getCleanRolesSet}"
+                  th:text="${iterStat.last}? ${role} : ${role + ', '}">
+            </span>
 
-<div th:replace="header :: header"></div>
+        </div>
+        <div class="p-2 col-6 bg-dark text-right">
+            <a class="text-secondary" href="javascript: document.logoutForm.submit()" role="menuitem"> Logout</a>
+            <form name="logoutForm" th:action="@{/logout}" method="post" th:hidden="true">
+                <input hidden type="submit" value="Logout"/>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="p-2 col-2">
+            <nav class="nav flex-column">
+                <div th:insert="${#sets.contains(user.getCleanRolesSet, 'ADMIN')} ?  ~{adminmenufragment :: adminmenu} : ~{} ">...</div>
+                <a class="nav-link active bg-primary text-white rounded ml-n2 mt-2 mr-4" href="#">User</a>
 
-<table>
-    <tr>
-        <th>Id</th>
-        <th>Login</th>
-        <th>Name</th>
-        <th>Surname</th>
-        <th>Age</th>
-        <th>Email</th>
-        <th>Role</th>
-    </tr>
-    <tr >
-        <td th:text="${user.getId()}"></td>
-        <td th:text="${user.getUserlogin()}"></td>
-        <td th:text="${user.getName}"></td>
-        <td th:text="${user.getSurname()}"></td>
-        <td th:text="${user.getAge()}"></td>
-        <td th:text="${user.getEmail()}"></td>
-        <td> <span th:each="role, iterStat  : ${user.getRoles()}" th:text="${iterStat.last}? ${role.getRole()} : ${role.getRole() + ', '}"></span></td>
-    </tr>
-</table>
+            </nav>
+        </div>
+        <div class="p-2 col-10 bg-white">
+            <h1 class="display-4"><small>User information page</small></h1>
+            <div class="card mr-4">
+                <div class="card-header">
+                    <h5 class="font-weight-bold">About user</h5>
+                </div>
+                <div class="card-body">
+                    <hr>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">First Name</th>
+                            <th scope="col">Last Name</th>
+                            <th scope="col">Age</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Role</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td th:text="${user.getId()}">1</td>
+                            <td th:text="${user.getName()}">Mark</td>
+                            <td th:text="${user.getSurname()}">Otto</td>
+                            <td th:text="${user.getAge()}">34</td>
+                            <td th:text="${user.getEmail()}">eret</td>
+                            <td><span th:each="role, iterStat  : ${user.getCleanRolesSet}"
+                                      th:text="${iterStat.last}? ${role} : ${role + ', '}"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+
 </body>
 </html>

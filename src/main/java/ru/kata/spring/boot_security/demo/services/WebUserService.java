@@ -19,15 +19,17 @@ public interface WebUserService extends UserDetailsService {
 
 
     @Override
-    public UserDetails loadUserByUsername(String webusername);
+    UserDetails loadUserByUsername(String webusername);
 
     WebUser findUserById(Long userId);
 
     List<WebUser> allUsers();
 
-    public void saveUser(WebUser user);
+    void saveUser(WebUser user);
 
-    public void updateUser(long id, WebUser user);
+    void updateUser(long id, WebUser user);
 
-    public void deleteUser(Long userId);
+    void deleteUser(Long userId);
+
+    List<String> getUserRoleNames(Long id);
 }

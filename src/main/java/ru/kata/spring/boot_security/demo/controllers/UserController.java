@@ -1,6 +1,5 @@
 package ru.kata.spring.boot_security.demo.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -12,8 +11,12 @@ import ru.kata.spring.boot_security.demo.services.WebUserService;
 @Controller
 @RequestMapping("/userarea")
 public class UserController {
-    @Autowired
-    private WebUserService userService;
+    private final WebUserService userService;
+
+    public UserController(WebUserService userService) {
+        this.userService = userService;
+    }
+
 
     @GetMapping("/user")
     public String userList(Model model) {

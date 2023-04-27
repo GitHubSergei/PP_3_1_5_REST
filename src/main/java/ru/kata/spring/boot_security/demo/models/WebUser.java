@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name="users")
@@ -16,8 +17,6 @@ public class WebUser implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column (name = "userlogin")
-    private String userlogin;
     @Column (name = "name")
     private String name;
 
@@ -28,7 +27,7 @@ public class WebUser implements UserDetails {
     private int age;
 
     @Column (name = "email")
-    private String email;
+    private String userEmail;
 
     @Column (name = "password")
     private String password;
@@ -61,14 +60,6 @@ public class WebUser implements UserDetails {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getUserlogin() {
-        return userlogin;
-    }
-
-    public void setUserlogin(String userlogin) {
-        this.userlogin = userlogin;
     }
 
     public String getName() {
@@ -106,7 +97,7 @@ public class WebUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return userlogin;
+        return userEmail;
     }
 
     @Override
@@ -137,11 +128,11 @@ public class WebUser implements UserDetails {
     }
 
     public String getEmail() {
-        return email;
+        return userEmail;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 
     public Set<Role> getRoles() {
@@ -150,5 +141,17 @@ public class WebUser implements UserDetails {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public Set<Role> getCleanRoles() {
+        return roles.stream()
+                .map(role -> {role.setRole(role.getRole().replaceAll("ROLE_","")); return role;})
+                .collect(Collectors.toSet());
+    }
+
+    public Set<String> getCleanRolesSet() {
+        return roles.stream()
+                .map(role -> role.getRole().replaceAll("ROLE_","")).collect(Collectors.toSet());
+
     }
 }
