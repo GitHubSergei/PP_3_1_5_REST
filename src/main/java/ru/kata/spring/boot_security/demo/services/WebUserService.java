@@ -23,6 +23,8 @@ public interface WebUserService extends UserDetailsService {
 
     WebUser findUserById(Long userId);
 
+    WebUser findUserByEmail(String email);
+
     List<WebUser> allUsers();
 
     void saveUser(WebUser user);

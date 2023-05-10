@@ -15,8 +15,8 @@ public class Role implements GrantedAuthority {
     @Column(name = "role")
     private String role;
 
-    @ManyToMany(mappedBy = "roles")
-    private Set<WebUser> webUserSet;
+//    @ManyToMany(mappedBy = "roles")
+//    private Set<WebUser> webUserSet;
 
     public Role() {
     }
@@ -46,13 +46,13 @@ public class Role implements GrantedAuthority {
         this.role = role;
     }
 
-    public Set<WebUser> getWebUserSet() {
-        return webUserSet;
-    }
-
-    public void setWebUserSet(Set<WebUser> webUserSet) {
-        this.webUserSet = webUserSet;
-    }
+//    public Set<WebUser> getWebUserSet() {
+//        return webUserSet;
+//    }
+//
+//    public void setWebUserSet(Set<WebUser> webUserSet) {
+//        this.webUserSet = webUserSet;
+//    }
 
     @Override
     public String getAuthority() {

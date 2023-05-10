@@ -27,4 +27,9 @@ public class RoleServiceImpl implements RoleService{
                 .map(role -> {role.setRole(role.getRole().replaceAll("ROLE_","")); return role;})
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Role getRoleById(Long id) {
+        return roleRepository.getById(id);
+    }
 }

@@ -11,17 +11,9 @@ import ru.kata.spring.boot_security.demo.services.WebUserService;
 @Controller
 @RequestMapping("/userarea")
 public class UserController {
-    private final WebUserService userService;
-
-    public UserController(WebUserService userService) {
-        this.userService = userService;
-    }
-
 
     @GetMapping("/user")
     public String userList(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        model.addAttribute("user", userService.loadUserByUsername(auth.getName()));
         return "user";
     }
 }

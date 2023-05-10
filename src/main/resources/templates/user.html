@@ -13,15 +13,15 @@
     <div class="row">
         <div class="p-2 col-6 bg-dark text-left text-white">
             <span class="h5 font-weight-bold"
-                    th:text="${user.email}"></span><span class="h5">  with roles: </span> <!---md-3 col-lg-->
-            <span class="h5" th:each="role, iterStat  : ${user.getCleanRolesSet}"
-                  th:text="${iterStat.last}? ${role} : ${role + ', '}">
+            ></span><span class="h5">  with roles: </span>
+            <span class="h5"
+            >
             </span>
 
         </div>
         <div class="p-2 col-6 bg-dark text-right">
             <a class="text-secondary" href="javascript: document.logoutForm.submit()" role="menuitem"> Logout</a>
-            <form name="logoutForm" th:action="@{/logout}" method="post" th:hidden="true">
+            <form name="logoutForm" action="/logout" method="post">
                 <input hidden type="submit" value="Logout"/>
             </form>
         </div>
@@ -29,9 +29,6 @@
     <div class="row">
         <div class="p-2 col-2">
             <nav class="nav flex-column">
-                <div th:insert="${#sets.contains(user.getCleanRolesSet, 'ADMIN')} ?  ~{adminmenufragment :: adminmenu} : ~{} ">...</div>
-                <a class="nav-link active bg-primary text-white rounded ml-n2 mt-2 mr-4" href="#">User</a>
-
             </nav>
         </div>
         <div class="p-2 col-10 bg-white">
@@ -54,16 +51,6 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td th:text="${user.getId()}">1</td>
-                            <td th:text="${user.getName()}">Mark</td>
-                            <td th:text="${user.getSurname()}">Otto</td>
-                            <td th:text="${user.getAge()}">34</td>
-                            <td th:text="${user.getEmail()}">eret</td>
-                            <td><span th:each="role, iterStat  : ${user.getCleanRolesSet}"
-                                      th:text="${iterStat.last}? ${role} : ${role + ', '}"></span>
-                            </td>
-                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -80,7 +67,85 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+<script type="text/javascript">
 
+    function waitForElement(selector) {
+        return new Promise(function (resolve, reject) {
+            var element = document.querySelectorAll(selector)[0];
 
+            if (element) {
+                resolve(element);
+                return;
+            }
+            var observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    var nodes = Array.from(mutation.addedNodes);
+                    for (var node of nodes) {
+                        if (node.matches && node.matches(selector)) {
+                            observer.disconnect();
+                            resolve(node);
+                            return;
+                        }
+                    }
+                });
+            });
+            observer.observe(document.documentElement, {childList: true, subtree: true});
+        });
+    }
+
+    const setHeader = (data) => {
+        let headerData = '<span class="h5 font-weight-bold">' + data.userEmail +
+            '</span><span class="h5">  with roles: </span><span class="h5">' + data.roles.map(e => " " + e.role) + '</span>';
+        document.querySelectorAll(".p-2.col-6.bg-dark.text-left.text-white")[0].innerHTML = headerData;
+    }
+
+    const makeMenu = (data) => {
+        let menuData = "";
+        if (isAdmin(data)) {
+            menuData = '<a class="nav-link ml-n2 mt-2 mr-4" aria-current="page" href="../admin/adminpanel">Admin</a>'
+        }
+        menuData += '<a class="nav-link active bg-primary text-white rounded ml-n2 mt-2 mr-4" href="#">User</a>';
+        document.querySelectorAll(".flex-column")[0].innerHTML = menuData;
+    }
+
+    const getData = async (url) => {
+        const res = await fetch(url)
+        const json = await res.json()
+        return json
+    }
+
+    const isAdmin = (data) => {
+        for (i = 0; i < data.roles.length; i++) {
+            if (data.roles[i].role.includes("ADMIN")) {
+                return true
+            }
+        }
+        return false;
+    }
+
+    const updateTable = (d) => {
+        let tableData = "";
+
+        tableData += "<tr><td>" + d.id + "</td>";
+        tableData += "<td>" + d.name + "</td>";
+        tableData += "<td>" + d.surname + "</td>";
+        tableData += "<td>" + d.age + "</td>";
+        tableData += "<td>" + d.userEmail + "</td>";
+        tableData += "<td>" + d.roles.map(e => " " + e.role) + "</td>";
+
+        document.getElementsByTagName("tbody")[0].innerHTML = tableData;
+    }
+
+    waitForElement(".p-2.col-6.bg-dark.text-left.text-white").then(function (element) {
+        getData("../api/all/whois")
+            .then(result => {
+                setHeader(result);
+                updateTable(result);
+                makeMenu(result)
+            })
+            .catch(error => console.log(error.message))
+    });
+
+</script>
 </body>
 </html>

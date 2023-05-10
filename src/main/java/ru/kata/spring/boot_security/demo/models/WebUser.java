@@ -143,6 +143,10 @@ public class WebUser implements UserDetails {
         this.roles = roles;
     }
 
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
+
     public Set<Role> getCleanRoles() {
         return roles.stream()
                 .map(role -> {role.setRole(role.getRole().replaceAll("ROLE_","")); return role;})

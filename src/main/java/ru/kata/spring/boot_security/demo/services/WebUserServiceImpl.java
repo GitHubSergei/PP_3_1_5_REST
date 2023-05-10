@@ -1,8 +1,6 @@
 package ru.kata.spring.boot_security.demo.services;
 
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.kata.spring.boot_security.demo.models.WebUser;
@@ -10,19 +8,20 @@ import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 import ru.kata.spring.boot_security.demo.repositories.WebUserRepository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class WebUserServiceImpl implements WebUserService {
 
     private final WebUserRepository webUserRepository;
-
-    public WebUserServiceImpl(WebUserRepository webUserRepository) {
+    private final RoleRepository roleRepository;
+    public WebUserServiceImpl(WebUserRepository webUserRepository, RoleRepository roleRepository) {
         this.webUserRepository = webUserRepository;
+        this.roleRepository = roleRepository;
     }
 
     @Override
@@ -40,19 +39,34 @@ public class WebUserServiceImpl implements WebUserService {
         return userFromDb.orElse(new WebUser());
     }
 
+    @Override
+    public WebUser findUserByEmail(String email) {
+        Optional<WebUser> webUser = webUserRepository.findByUserEmail(email);
+        return webUser.orElse(new WebUser());
+    }
+
     public List<WebUser> allUsers() {
         return webUserRepository.findAll();
     }
 
     public void saveUser(WebUser user) {
-        user.setRoles(user.getRoles());
+        //user.setRoles(user.getRoles());
+        Set<Role> rolesSet = new HashSet<>(user.getRoles());
+        user.setRoles(new HashSet<>());
+        for (Role role : rolesSet
+             ) {
+            user.addRole(roleRepository.getById(role.getId()));
+        }
         user.setPassword(user.getPassword());
         webUserRepository.save(user);
     }
 
     public void updateUser(long id, WebUser user) {
         user.setId(id);
-        webUserRepository.save(user);
+        if (user.getPassword().isEmpty()) {
+            user.setPassword(webUserRepository.findById(id).get().getPassword());
+        }
+        saveUser(user);
     }
 
     public void deleteUser(Long userId) {
