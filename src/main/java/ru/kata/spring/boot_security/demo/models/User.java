@@ -7,12 +7,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
 @Table(name="users")
-public class WebUser implements UserDetails {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,17 +37,16 @@ public class WebUser implements UserDetails {
     private boolean isEnabled;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @Fetch(FetchMode.JOIN)
     @JoinTable(name = "webuser_role",
     joinColumns = @JoinColumn(name="webuser_id"),
     inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
-    public WebUser() {
+    public User() {
         this.isEnabled = true;
     }
 
-    public WebUser(String name, String surname, int age, String password) {
+    public User(String name, String surname, int age, String password) {
         this.name = name;
         this.surname = surname;
         this.age = age;

@@ -2,11 +2,12 @@ package ru.kata.spring.boot_security.demo.services;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.kata.spring.boot_security.demo.models.WebUser;
+import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
-import ru.kata.spring.boot_security.demo.repositories.WebUserRepository;
+import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -15,18 +16,20 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class WebUserServiceImpl implements WebUserService {
+public class UserServiceImpl implements UserService {
 
-    private final WebUserRepository webUserRepository;
+    private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    public WebUserServiceImpl(WebUserRepository webUserRepository, RoleRepository roleRepository) {
-        this.webUserRepository = webUserRepository;
+    private final PasswordEncoder passwordEncoder;
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public UserDetails loadUserByUsername(String webusername) throws UsernameNotFoundException {
-        Optional<WebUser> webUser = webUserRepository.findByUserEmail(webusername);
+        Optional<User> webUser = userRepository.findByUserEmail(webusername);
 
         if (webUser.isEmpty()) {
             throw new UsernameNotFoundException("User not found!");
@@ -34,51 +37,51 @@ public class WebUserServiceImpl implements WebUserService {
         return webUser.get();
     }
 
-    public WebUser findUserById(Long userId) {
-        Optional<WebUser> userFromDb = webUserRepository.findById(userId);
-        return userFromDb.orElse(new WebUser());
+    public User findUserById(Long userId) {
+        Optional<User> userFromDb = userRepository.findById(userId);
+        return userFromDb.orElse(new User());
     }
 
     @Override
-    public WebUser findUserByEmail(String email) {
-        Optional<WebUser> webUser = webUserRepository.findByUserEmail(email);
-        return webUser.orElse(new WebUser());
+    public User findUserByEmail(String email) {
+        Optional<User> webUser = userRepository.findByUserEmail(email);
+        return webUser.orElse(new User());
     }
 
-    public List<WebUser> allUsers() {
-        return webUserRepository.findAll();
+    public List<User> allUsers() {
+        return userRepository.findAll();
     }
 
-    public void saveUser(WebUser user) {
-        //user.setRoles(user.getRoles());
+    public void saveUser(User user) {
+
         Set<Role> rolesSet = new HashSet<>(user.getRoles());
         user.setRoles(new HashSet<>());
         for (Role role : rolesSet
              ) {
             user.addRole(roleRepository.getById(role.getId()));
         }
-        user.setPassword(user.getPassword());
-        webUserRepository.save(user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
     }
 
-    public void updateUser(long id, WebUser user) {
+    public void updateUser(long id, User user) {
         user.setId(id);
         if (user.getPassword().isEmpty()) {
-            user.setPassword(webUserRepository.findById(id).get().getPassword());
+            user.setPassword(userRepository.findById(id).get().getPassword());
         }
         saveUser(user);
     }
 
     public void deleteUser(Long userId) {
-        if (webUserRepository.findById(userId).isPresent()) {
-            webUserRepository.deleteById(userId);
+        if (userRepository.findById(userId).isPresent()) {
+            userRepository.deleteById(userId);
         }
     }
 
 
     @Override
     public List<String> getUserRoleNames(Long userId) {
-        Optional<WebUser> webUser = webUserRepository.findById(userId);
+        Optional<User> webUser = userRepository.findById(userId);
         if (!webUser.isEmpty()) {
             return webUser.get().getRoles().stream()
                     .map(Role::getRole)

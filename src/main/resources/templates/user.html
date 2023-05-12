@@ -102,7 +102,7 @@
     const makeMenu = (data) => {
         let menuData = "";
         if (isAdmin(data)) {
-            menuData = '<a class="nav-link ml-n2 mt-2 mr-4" aria-current="page" href="../admin/adminpanel">Admin</a>'
+            menuData = '<a class="nav-link ml-n2 mt-2 mr-4" aria-current="page" href="../adminpanel">Admin</a>'
         }
         menuData += '<a class="nav-link active bg-primary text-white rounded ml-n2 mt-2 mr-4" href="#">User</a>';
         document.querySelectorAll(".flex-column")[0].innerHTML = menuData;

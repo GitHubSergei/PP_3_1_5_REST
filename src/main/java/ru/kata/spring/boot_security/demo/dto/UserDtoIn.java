@@ -4,7 +4,7 @@ import ru.kata.spring.boot_security.demo.models.Role;
 
 import java.util.Set;
 
-public class WebUserDtoIn {
+public class UserDtoIn {
     private String name;
     private String surname;
     private int age;

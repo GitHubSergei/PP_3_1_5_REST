@@ -5,7 +5,7 @@ import ru.kata.spring.boot_security.demo.models.Role;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class WebUserDtoOut {
+public class UserDtoOut {
 
     private Long id;
     private String name;

@@ -24,7 +24,7 @@
         <div class="p-2 col-2">
             <nav class="nav flex-column">
                 <a class="nav-link active bg-primary text-white rounded ml-n2 mt-2 mr-4" aria-current="page" href="#">Admin</a>
-                <a class="nav-link" href="/userarea/user">User</a>
+                <a class="nav-link" href="/user">User</a>
 
             </nav>
         </div>
@@ -61,6 +61,8 @@
                                 </tr>
                                 </thead>
                                 <tbody>
+                                </tbody>
+                            </table>
 
                                 <div class="modal" id="modalEdit" tabindex="-1" role="dialog"
                                      aria-labelledby="exampleModalLabel"
@@ -215,8 +217,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                </tbody>
-                            </table>
+
                         </div>
                     </div>
                 </div>
@@ -369,7 +370,7 @@
 
     async function deleteUser(data) {
         try {
-            const response = await fetch("../api/secured/" + data, {
+            const response = await fetch("../api/user/" + data, {
                 method: "DELETE",
                 headers: {
                     "Access-Control-Allow-Origin": "*"
@@ -392,8 +393,8 @@
             roles: getSelectedValues(document.getElementById("usrRoles"))
         };
         try {
-            const response = await fetch("../api/secured/" + data, {
-                method: "PATCH",
+            const response = await fetch("../api/user/" + data, {
+                method: "POST",
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'PATCH',
@@ -426,8 +427,8 @@
             roles: getSelectedValues(document.getElementById("userRoles"))
         };
         try {
-            const response = await fetch("../api/secured/new", {
-                method: "POST",
+            const response = await fetch("../api/user", {
+                method: "PUT",
                 headers: {
                     "Access-Control-Allow-Origin": "*",
                     "Content-Type": "application/json",
@@ -439,7 +440,7 @@
             console.log("Success:", result);
             document.querySelectorAll("div>ul>li>a")[0].click();
             waitForElement('tbody').then(function (element) {
-                getData("../api/secured")
+                getData("../api/user")
                     .then(result => updateTable(result))
                     .catch(error => console.log(error.message))
             });
@@ -495,7 +496,7 @@
         await deleteUser(document.getElementById("modalDelete").getElementsByTagName('input')[0].value)
             .then(() => {
                 waitForElement('tbody').then(function (element) {
-                    getData("../api/secured")
+                    getData("../api/user")
                         .then(result => {
                             updateTable(result);
                             document.getElementById("modalDelete").querySelectorAll(".btn-secondary")[0].click();
@@ -513,7 +514,7 @@
             delB.addEventListener('submit', doDelete);
 
 
-            getData("../api/secured/whois/" + id)
+            getData("../api/user/" + id)
                 .then(result => setModalData(result, "del_"))
                 .catch(error => console.log(error.message))
             console.log("111");
@@ -526,7 +527,7 @@
         await editUser(document.getElementById("modalEdit").getElementsByTagName('input')[0].value)
             .then(() => {
                 waitForElement('tbody').then(function (element) {
-                    getData("../api/secured")
+                    getData("../api/user")
                         .then(result => {
                             updateTable(result);
                             document.getElementById("modalEdit").querySelectorAll(".btn-secondary")[0].click();
@@ -544,7 +545,7 @@
             delB.addEventListener('submit', doEdit);
 
 
-            getData("../api/secured/whois/" + id)
+            getData("../api/user/" + id)
                 .then(result => setModalData(result, ""))
                 .catch(error => console.log(error.message))
             console.log("222");
@@ -585,7 +586,7 @@
     });
 
     waitForElement('tbody').then(function (element) {
-        getData("../api/secured")
+        getData("../api/user")
             .then(result => updateTable(result))
             .catch(error => console.log(error.message))
     });
