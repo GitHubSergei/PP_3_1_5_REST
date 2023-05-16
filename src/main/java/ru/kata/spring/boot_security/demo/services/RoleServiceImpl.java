@@ -11,18 +11,22 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
-public class RoleServiceImpl implements RoleService{
+public class RoleServiceImpl implements RoleService {
     private final RoleRepository roleRepository;
 
     @Autowired
     public RoleServiceImpl(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
     }
+
     @Override
     public List<Role> getAllRoles() {
 
         return roleRepository.findAll().stream()
-                .map(role -> {role.setRole(role.getRole().replaceAll("ROLE_","")); return role;})
+                .map(role -> {
+                    role.setRole(role.getRole().replaceAll("ROLE_", ""));
+                    return role;
+                })
                 .collect(Collectors.toList());
     }
 
